@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Monster Game</title>
+	<script src="https://npmcdn.com/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="foundation.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+    <section class="row">
+        <div class="small-6 columns">
+            <h1 class="text-center">YOU</h1>
+            <div class="healthbar">
+                <div 
+                     class="healthbar text-center" 
+                     :style="{width: you.life + '%'}" 
+                     style="background-color: green; margin: 0; color: white;">
+                    <div> {{ you.life }} </div>
+                </div>
+            </div>
+        </div>
+        <div class="small-6 columns">
+            <h1 class="text-center">MONSTER</h1>
+            <div class="healthbar">
+                <div class="healthbar text-center" :style="{width: monster.life + '%'}" style="background-color: green; margin: 0; color: white;">
+                    <div> {{ monster.life }} </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section v-if="!gameActive" class="row controls">
+        <div class="small-12 columns">
+            <button @click="startGame()" id="start-game">START NEW GAME</button>
+        </div>
+    </section>
+    <section v-if="gameActive" class="row controls">
+        <div class="small-12 columns">
+            <button @click="attack()" id="attack">ATTACK</button>
+            <button @click="specialAttack()" id="special-attack">SPECIAL ATTACK</button>
+            <button @click="heal()" id="heal">HEAL</button>
+            <button @click="giveUp()" id="give-up">GIVE UP</button>
+        </div>
+    </section>
+    <section v-if="gameActive" class="row log">
+        <div class="small-12 columns">
+            <ul>
+                <template v-for="turn in turns">
+                    <li class="player-turn">
+                        <template v-if="you.type[turn - 1] === 'Healed'"> You Healed for {{ you.power[turn - 1] }}.</template>
+                        <template v-if="you.type[turn - 1]  === 'Damage'"> You did {{ you.power[turn - 1] }} damage to the monster.</template>
+                    </li>
+                    <li class="monster-turn">
+                        The monster did {{ monster.attack[turn - 1] }} Damage.
+                    </li>
+                </template>
+            </ul>
+        </div>
+    </section>
+</div>
+<script>
+    new Vue({
+        el: '#app',
+        data:{
+            gameActive: false,
+            turns: 0,
+            you:{
+                life: 100,
+                power:[],
+                type:[],
+            },
+            monster:{
+                life: 100,
+                attack: [],  
+            },
+        },
+        methods:{
+            startGame: function(){
+                this.gameActive = true;
+                this.you.life = 100;
+                this.monster.life = 100;
+            },
+            attack: function(){
+                this.monsterAttack();
+                this.youAttack(7);
+                this.endGame();
+                this.nextTurn();
+            },
+            specialAttack: function(){
+                this.monsterAttack();
+                this.youAttack(12);
+                this.endGame();
+                this.nextTurn();
+            },
+            heal: function(){
+                const heal = this.calcPower(12);
+                this.monsterAttack();
+                if((this.you.life + heal) > 100){
+                    this.addYouTurn((100 - this.you.life), 'Healed');
+                    this.you.life = 100;
+                }else{
+                    this.you.life = this.you.life + heal;
+                    this.addYouTurn(heal, 'Healed');
+                }
+                this.endGame();
+                this.nextTurn();
+            },
+            giveUp: function(){
+                this.reset();
+            },
+            nextTurn: function(){
+                this.turns += 1;
+            },
+            reset: function(){
+                this.gameActive = false;
+                this.you.life = 100;
+                this.monster.life = 100;
+                this.turns = 0;
+            },
+            calcPower: function(power){
+                return Math.floor(Math.random() * power) + 1;
+            },
+            monsterAttack: function(){
+                const power = this.calcPower(10);
+                this.you.life = this.you.life - power;
+                this.monster.attack.unshift(power);
+            },
+            youAttack: function(strength, type){
+                const power = this.calcPower(strength);
+                this.monster.life = this.monster.life - power ;
+                this.addYouTurn(power, 'Damage');
+            },
+            addYouTurn: function(power, type){
+                this.you.power.unshift(power);
+                this.you.type.unshift(type);
+            },
+            endGame: function(){
+                if(this.you.life < 0){
+                    alert('You lost, try again');
+                    this.giveUp();
+                }
+                else if(this.monster.life < 0){
+                    alert('You won, GJ.');
+                    this.giveUp();
+                }
+            },
+        },
+    })
+</script>
+</body>
+</html>
