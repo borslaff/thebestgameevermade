@@ -12,7 +12,7 @@
 <div id="app">
     <section class="row">
         <div class="small-6 columns">
-            <h1 class="text-center">YOU</h1>
+            <h1 class="text-center">Steve</h1>
             <div class="healthbar">
                 <div 
                      class="healthbar text-center" 
@@ -23,7 +23,7 @@
             </div>
         </div>
         <div class="small-6 columns">
-            <h1 class="text-center">MONSTER</h1>
+            <h1 class="text-center">Boris</h1>
             <div class="healthbar">
                 <div class="healthbar text-center" :style="{width: monster.life + '%'}" style="background-color: green; margin: 0; color: white;">
                     <div> {{ monster.life }} </div>
@@ -49,11 +49,11 @@
             <ul>
                 <template v-for="turn in turns">
                     <li class="player-turn">
-                        <template v-if="you.type[turn - 1] === 'Healed'"> You Healed for {{ you.power[turn - 1] }}.</template>
-                        <template v-if="you.type[turn - 1]  === 'Damage'"> You did {{ you.power[turn - 1] }} damage to the monster.</template>
+                        <template v-if="you.type[turn - 1] === 'Healed'"> Steve Healed for {{ you.power[turn - 1] }}.</template>
+                        <template v-if="you.type[turn - 1]  === 'Damage'"> Steve did {{ you.power[turn - 1] }} damage to the monster.</template>
                     </li>
                     <li class="monster-turn">
-                        The monster did {{ monster.attack[turn - 1] }} Damage.
+                        Boris did {{ monster.attack[turn - 1] }} Damage.
                     </li>
                 </template>
             </ul>
@@ -138,11 +138,11 @@
             },
             endGame: function(){
                 if(this.you.life < 0){
-                    alert('You lost, try again');
+                    alert('Boris cheated.');
                     this.giveUp();
                 }
                 else if(this.monster.life < 0){
-                    alert('You won, GJ.');
+                    alert('Steve won, as expected.');
                     this.giveUp();
                 }
             },
